@@ -6,6 +6,16 @@ interface PageProps {
   params: Promise<{ id: string }>
 }
 
+interface Player {
+  id: string
+  name: string
+  avatar_url?: string
+  total: number
+  wins: number
+  losses: number
+  games: number
+}
+
 export default async function SessionDetailPage({ params }: PageProps) {
   const { id } = await params
   const supabase = await createClient()
@@ -61,9 +71,9 @@ export default async function SessionDetailPage({ params }: PageProps) {
     if (t.amount > 0) acc[playerId].wins += t.amount
     else acc[playerId].losses += Math.abs(t.amount)
     return acc
-  }, {} as Record<string, any>)
+  }, {} as Record<string, Player>)
 
-  const players = Object.values(playerStats || {})
+  const players: Player[] = Object.values(playerStats || {})
 
   return (
     <div className="min-h-screen bg-gray-50">

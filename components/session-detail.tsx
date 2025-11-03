@@ -18,9 +18,18 @@ interface Player {
   games: number
 }
 
+interface TransactionWithProfile extends Transaction {
+  profiles?: {
+    id: string
+    full_name: string | null
+    email: string
+    avatar_url: string | null
+  }
+}
+
 interface SessionDetailProps {
   session: Session
-  transactions: any[]
+  transactions: TransactionWithProfile[]
   players: Player[]
   currentUserId: string
 }
@@ -157,7 +166,7 @@ export function SessionDetail({ session, transactions, players, currentUserId }:
           </div>
         ) : (
           <div className="space-y-3">
-            {transactions.map((transaction: any) => {
+            {transactions.map((transaction) => {
               const isWin = transaction.amount > 0
               const isOwnTransaction = transaction.user_id === currentUserId
               return (

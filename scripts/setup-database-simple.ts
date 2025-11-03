@@ -79,7 +79,6 @@ if (fs.existsSync(schemaPath)) {
 } else {
   console.error('❌ Error: schema.sql not found!')
   console.error(`    Expected at: ${schemaPath}`)
-  process.exit(1)
 }
 
 console.log('🎲 Ready to set up your database!')
