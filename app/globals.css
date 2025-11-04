@@ -11,6 +11,11 @@ html.light {
   --foreground: #000000;
   --card-bg: #ffffff;
   --card-border: #e5e7eb;
+  --tooltip-bg: #ffffff;
+  --tooltip-border: #e5e7eb;
+  --tooltip-text: #1f2937;
+  --chart-color: #8b5cf6;
+  --chart-line-color: #8b5cf6;
 }
 
 /* Dark Theme */
@@ -19,6 +24,11 @@ html.dark {
   --foreground: #ededed;
   --card-bg: #1a1a1a;
   --card-border: #2a2a2a;
+  --tooltip-bg: #1f2937;
+  --tooltip-border: #374151;
+  --tooltip-text: #f3f4f6;
+  --chart-color: #a78bfa;
+  --chart-line-color: #a78bfa;
 }
 
 /* Halloween Theme 🎃 */
@@ -27,6 +37,11 @@ html.halloween {
   --foreground: #ff9500;
   --card-bg: #2d1810;
   --card-border: #4a2618;
+  --tooltip-bg: #2d1810;
+  --tooltip-border: #7c2d12;
+  --tooltip-text: #fed7aa;
+  --chart-color: #ea580c;
+  --chart-line-color: #f97316;
 }
 
 @theme inline {

@@ -60,34 +60,48 @@ export function TrendChart({ dailyBalances }: TrendChartProps) {
           <AreaChart data={chartData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id="colorCumulative" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3}/>
-                <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                <stop offset="5%" stopColor="var(--chart-color, #8b5cf6)" stopOpacity={0.3}/>
+                <stop offset="95%" stopColor="var(--chart-color, #8b5cf6)" stopOpacity={0}/>
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+            <CartesianGrid 
+              strokeDasharray="3 3" 
+              className="stroke-gray-200 dark:stroke-gray-700 halloween:stroke-orange-900"
+            />
             <XAxis 
               dataKey="date" 
-              tick={{ fontSize: 11, fill: '#6b7280' }}
+              tick={{ fontSize: 11 }}
+              className="fill-gray-600 dark:fill-gray-400 halloween:fill-orange-400"
               tickLine={false}
             />
             <YAxis 
-              tick={{ fontSize: 11, fill: '#6b7280' }}
+              tick={{ fontSize: 11 }}
+              className="fill-gray-600 dark:fill-gray-400 halloween:fill-orange-400"
               tickLine={false}
               tickFormatter={(value) => `$${value}`}
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: 'white',
-                border: '1px solid #e5e7eb',
+                backgroundColor: 'var(--tooltip-bg)',
+                border: '1px solid var(--tooltip-border)',
                 borderRadius: '12px',
                 padding: '8px 12px',
+                color: 'var(--tooltip-text)',
               }}
+              labelStyle={{
+                color: 'var(--tooltip-text)',
+                marginBottom: '4px',
+              }}
+              itemStyle={{
+                color: 'var(--tooltip-text)',
+              }}
+              cursor={{ strokeDasharray: '3 3' }}
               formatter={(value: number) => [`$${value.toFixed(2)}`, 'Balance']}
             />
             <Area 
               type="monotone" 
               dataKey="cumulative" 
-              stroke="#8b5cf6" 
+              stroke="var(--chart-line-color, #8b5cf6)" 
               strokeWidth={3}
               fill="url(#colorCumulative)" 
             />

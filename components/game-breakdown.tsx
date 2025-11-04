@@ -74,11 +74,19 @@ export function GameBreakdown({ transactions }: GameBreakdownProps) {
               </Pie>
               <Tooltip
                 contentStyle={{
-                  backgroundColor: 'white',
-                  border: '1px solid #e5e7eb',
+                  backgroundColor: 'var(--tooltip-bg)',
+                  border: '1px solid var(--tooltip-border)',
                   borderRadius: '12px',
                   padding: '8px 12px',
+                  color: 'var(--tooltip-text)',
                 }}
+                labelStyle={{
+                  color: 'var(--tooltip-text)',
+                }}
+                itemStyle={{
+                  color: 'var(--tooltip-text)',
+                }}
+                cursor={{ fill: 'transparent' }}
                 formatter={(value: number, name: string, props: any) => [
                   `$${safeNumber(props.payload.total, 0).toFixed(2)} (${props.payload.count} games)`,
                   name

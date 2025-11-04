@@ -68,14 +68,14 @@ export function SessionDetail({ session, transactions, players, currentUserId }:
       {/* Back Button */}
       <Link
         href="/sessions"
-        className="inline-flex items-center gap-2 text-purple-600 hover:text-purple-700 font-medium"
+        className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 halloween:text-orange-500 hover:text-purple-700 dark:hover:text-purple-300 halloween:hover:text-orange-400 font-medium"
       >
         <ArrowLeft className="w-5 h-5" />
         Back to Sessions
       </Link>
 
       {/* Session Info */}
-      <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl shadow-xl p-6 text-white">
+      <div className="bg-gradient-to-br from-purple-500 to-pink-500 halloween:from-orange-600 halloween:to-orange-800 rounded-2xl shadow-xl p-6 text-white">
         <div className="flex items-start justify-between mb-4">
           <div>
             <h1 className="text-2xl font-bold mb-2">{session.name}</h1>
@@ -109,8 +109,8 @@ export function SessionDetail({ session, transactions, players, currentUserId }:
       </div>
 
       {/* Leaderboard */}
-      <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Leaderboard</h2>
+      <div className="bg-white dark:bg-gray-800 halloween:bg-gray-900 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 halloween:border-orange-900 p-6">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white halloween:text-orange-400 mb-4">Leaderboard</h2>
         <div className="space-y-3">
           {sortedPlayers.map((player, index) => {
             const isCurrentUser = player.id === currentUserId
@@ -119,34 +119,34 @@ export function SessionDetail({ session, transactions, players, currentUserId }:
               <div
                 key={player.id}
                 className={`flex items-center gap-4 p-4 rounded-xl ${
-                  isCurrentUser ? 'bg-purple-50 border-2 border-purple-200' : 'bg-gray-50'
+                  isCurrentUser ? 'bg-purple-50 dark:bg-purple-900/20 halloween:bg-orange-900/20 border-2 border-purple-200 dark:border-purple-700 halloween:border-orange-700' : 'bg-gray-50 dark:bg-gray-700 halloween:bg-gray-800'
                 }`}
               >
                 <div className="flex-shrink-0">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 halloween:from-orange-600 halloween:to-orange-800 flex items-center justify-center text-white font-bold">
                     {index + 1}
                   </div>
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-gray-900 truncate">
+                  <p className="font-semibold text-gray-900 dark:text-white halloween:text-orange-300 truncate leading-tight">
                     {player.name} {isCurrentUser && '(You)'}
                   </p>
-                  <p className="text-sm text-gray-500">{player.games} games</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 halloween:text-orange-400 mt-0.5">{player.games} games</p>
                 </div>
 
-                <div className="text-right">
-                  <div className="flex items-center gap-1">
+                <div className="text-right flex-shrink-0">
+                  <div className="flex items-center justify-end gap-1">
                     {isWinning ? (
-                      <TrendingUp className="w-4 h-4 text-green-500" />
+                      <TrendingUp className="w-4 h-4 text-green-500 dark:text-green-400 flex-shrink-0" />
                     ) : (
-                      <TrendingDown className="w-4 h-4 text-red-500" />
+                      <TrendingDown className="w-4 h-4 text-red-500 dark:text-red-400 flex-shrink-0" />
                     )}
-                    <span className={`text-lg font-bold ${isWinning ? 'text-green-600' : 'text-red-600'}`}>
+                    <span className={`text-lg font-bold whitespace-nowrap ${isWinning ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                       {isWinning ? '+' : ''}${player.total.toFixed(2)}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 halloween:text-orange-400 mt-0.5 whitespace-nowrap">
                     W: ${player.wins.toFixed(0)} L: ${player.losses.toFixed(0)}
                   </p>
                 </div>
@@ -157,11 +157,11 @@ export function SessionDetail({ session, transactions, players, currentUserId }:
       </div>
 
       {/* Transaction History */}
-      <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Transaction History</h2>
+      <div className="bg-white dark:bg-gray-800 halloween:bg-gray-900 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 halloween:border-orange-900 p-6">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white halloween:text-orange-400 mb-4">Transaction History</h2>
 
         {transactions.length === 0 ? (
-          <div className="text-center py-8 text-gray-400">
+          <div className="text-center py-8 text-gray-400 dark:text-gray-500 halloween:text-orange-500">
             <p>No transactions yet</p>
           </div>
         ) : (
@@ -172,39 +172,43 @@ export function SessionDetail({ session, transactions, players, currentUserId }:
               return (
                 <div
                   key={transaction.id}
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-xl group"
+                  className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-700 halloween:bg-gray-800 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 halloween:hover:bg-gray-700 transition-colors group"
                 >
-                  <div className="flex items-center gap-3 flex-1">
-                    <span className="text-2xl">{GAME_EMOJIS[transaction.game]}</span>
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
+                      <span className="text-2xl leading-none">{GAME_EMOJIS[transaction.game]}</span>
+                    </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-gray-900">
+                      <p className="font-semibold text-gray-900 dark:text-white halloween:text-orange-300 leading-tight">
                         {GAME_LABELS[transaction.game]}
                       </p>
-                      <p className="text-xs text-gray-500 truncate">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 halloween:text-orange-400 truncate mt-0.5">
                         {transaction.profiles?.full_name || transaction.profiles?.email || 'Unknown'}
                       </p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs text-gray-400 dark:text-gray-500 halloween:text-orange-500 mt-0.5">
                         {format(parseISO(transaction.transaction_date), 'MMM dd, yyyy')}
                       </p>
                       {transaction.notes && (
-                        <p className="text-xs text-gray-500 mt-1">{transaction.notes}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 halloween:text-orange-400 mt-1">{transaction.notes}</p>
                       )}
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <span className={`text-lg font-bold ${isWin ? 'text-green-600' : 'text-red-600'}`}>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <span className={`text-lg font-bold whitespace-nowrap ${isWin ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                       {isWin ? '+' : ''}${transaction.amount.toFixed(2)}
                     </span>
-                    {isOwnTransaction && (
-                      <button
-                        onClick={() => handleDeleteTransaction(transaction.id)}
-                        disabled={deleting === transaction.id}
-                        className="opacity-0 group-hover:opacity-100 p-2 hover:bg-red-100 rounded-lg transition-all disabled:opacity-50"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-500" />
-                      </button>
-                    )}
+                    <div className="w-8 h-8 flex items-center justify-center">
+                      {isOwnTransaction && (
+                        <button
+                          onClick={() => handleDeleteTransaction(transaction.id)}
+                          disabled={deleting === transaction.id}
+                          className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 halloween:hover:bg-red-900/30 rounded-lg transition-all disabled:opacity-50"
+                        >
+                          <Trash2 className="w-4 h-4 text-red-500 dark:text-red-400" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               )

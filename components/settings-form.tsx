@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Profile } from '@/lib/types'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { User, Mail, Loader2, Save, LogOut } from 'lucide-react'
+import { User, Mail, Loader2, Save, LogOut, Camera, Upload } from 'lucide-react'
+import Image from 'next/image'
 
 interface SettingsFormProps {
   profile: Profile | null
@@ -12,11 +13,75 @@ interface SettingsFormProps {
 
 export function SettingsForm({ profile }: SettingsFormProps) {
   const [loading, setLoading] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url || '')
   const [formData, setFormData] = useState({
     full_name: profile?.full_name || '',
   })
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
   const supabase = createClient()
+
+  const uploadAvatar = async (file: File) => {
+    try {
+      setUploading(true)
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('Not authenticated')
+
+      // Create a unique file name
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${user.id}-${Math.random()}.${fileExt}`
+      const filePath = `${fileName}`
+
+      // Upload file to Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true })
+
+      if (uploadError) throw uploadError
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath)
+
+      // Update profile with new avatar URL
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', user.id)
+
+      if (updateError) throw updateError
+
+      setAvatarUrl(publicUrl)
+      alert('Profile picture updated successfully!')
+      router.refresh()
+    } catch (error: any) {
+      console.error('Error uploading avatar:', error)
+      alert(error.message || 'Failed to upload profile picture')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file')
+      return
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      alert('Image size must be less than 2MB')
+      return
+    }
+
+    await uploadAvatar(file)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -60,6 +125,56 @@ export function SettingsForm({ profile }: SettingsFormProps) {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Profile Picture */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 halloween:text-orange-300 mb-3">
+              Profile Picture
+            </label>
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <div className="w-20 h-20 rounded-full overflow-hidden bg-gradient-to-br from-purple-500 to-pink-500 halloween:from-orange-600 halloween:to-orange-800 flex items-center justify-center">
+                  {avatarUrl ? (
+                    <Image
+                      src={avatarUrl}
+                      alt="Profile"
+                      width={80}
+                      height={80}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <User className="w-10 h-10 text-white" />
+                  )}
+                </div>
+                {uploading && (
+                  <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center">
+                    <Loader2 className="w-6 h-6 text-white animate-spin" />
+                  </div>
+                )}
+              </div>
+              <div className="flex-1">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="flex items-center gap-2 px-4 py-2 bg-purple-50 dark:bg-purple-900/30 halloween:bg-orange-900/30 text-purple-600 dark:text-purple-400 halloween:text-orange-400 rounded-lg font-medium hover:bg-purple-100 dark:hover:bg-purple-900/50 halloween:hover:bg-orange-900/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Upload className="w-4 h-4" />
+                  {uploading ? 'Uploading...' : 'Upload Photo'}
+                </button>
+                <p className="text-xs text-gray-500 dark:text-gray-400 halloween:text-orange-500 mt-2">
+                  JPG, PNG or GIF. Max size 2MB.
+                </p>
+              </div>
+            </div>
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 halloween:text-orange-300 mb-2">
               Full Name
