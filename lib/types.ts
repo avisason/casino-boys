@@ -1,4 +1,4 @@
-export type GameType = 'blackjack' | 'poker' | 'ultimate-poker' | 'roulette'
+export type GameType = 'blackjack' | 'poker' | 'ultimate-poker' | 'roulette' | 'slots'
 
 export interface Profile {
   id: string
@@ -40,6 +40,18 @@ export interface DailyBalance {
   game_breakdown: Record<GameType, number>
 }
 
+export interface Budget {
+  id: string
+  user_id: string
+  period_type: 'weekly' | 'monthly'
+  amount: number
+  start_date: string
+  end_date: string
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
 export interface SessionSummary {
   session_id: string
   name: string
@@ -61,20 +73,23 @@ export const GAME_LABELS: Record<GameType, string> = {
   'blackjack': 'Blackjack',
   'poker': 'Poker',
   'ultimate-poker': 'Ultimate Poker',
-  'roulette': 'Roulette'
+  'roulette': 'Roulette',
+  'slots': 'Slots'
 }
 
 export const GAME_COLORS: Record<GameType, string> = {
   'blackjack': '#ef4444', // red
   'poker': '#3b82f6', // blue
   'ultimate-poker': '#8b5cf6', // purple
-  'roulette': '#10b981' // green
+  'roulette': '#10b981', // green
+  'slots': '#f59e0b' // amber
 }
 
 export const GAME_EMOJIS: Record<GameType, string> = {
   'blackjack': '🃏',
   'poker': '♠️',
   'ultimate-poker': '♦️',
-  'roulette': '🎰'
+  'roulette': '🎡',
+  'slots': '🎰'
 }
 

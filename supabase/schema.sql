@@ -51,7 +51,7 @@ CREATE POLICY "Users can delete sessions they created" ON sessions
   FOR DELETE USING (auth.uid() = created_by);
 
 -- Game types enum
-CREATE TYPE game_type AS ENUM ('blackjack', 'poker', 'ultimate-poker', 'roulette');
+CREATE TYPE game_type AS ENUM ('blackjack', 'poker', 'ultimate-poker', 'roulette', 'slots');
 
 -- Transactions table (tracks all game plays)
 CREATE TABLE IF NOT EXISTS transactions (
@@ -80,6 +80,34 @@ CREATE POLICY "Users can update their own transactions" ON transactions
 CREATE POLICY "Users can delete their own transactions" ON transactions
   FOR DELETE USING (auth.uid() = user_id);
 
+-- Budgets table (for budget tracking)
+CREATE TABLE IF NOT EXISTS budgets (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  period_type TEXT NOT NULL CHECK (period_type IN ('weekly', 'monthly')),
+  amount DECIMAL(10, 2) NOT NULL,
+  start_date DATE NOT NULL,
+  end_date DATE NOT NULL,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(user_id, period_type, start_date)
+);
+
+ALTER TABLE budgets ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view own budgets" ON budgets
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can create own budgets" ON budgets
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own budgets" ON budgets
+  FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete own budgets" ON budgets
+  FOR DELETE USING (auth.uid() = user_id);
+
 -- Create indexes for better query performance
 CREATE INDEX idx_transactions_user_id ON transactions(user_id);
 CREATE INDEX idx_transactions_session_id ON transactions(session_id);
@@ -105,6 +133,9 @@ CREATE TRIGGER update_sessions_updated_at BEFORE UPDATE ON sessions
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_transactions_updated_at BEFORE UPDATE ON transactions
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_budgets_updated_at BEFORE UPDATE ON budgets
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- View for user daily balances

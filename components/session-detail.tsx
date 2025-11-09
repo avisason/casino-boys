@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Session, Transaction, GAME_LABELS, GAME_EMOJIS } from '@/lib/types'
 import { format, parseISO } from 'date-fns'
-import { MapPin, Calendar, Users, ArrowLeft, TrendingUp, TrendingDown, Trash2 } from 'lucide-react'
+import { MapPin, Calendar, Users, ArrowLeft, TrendingUp, TrendingDown, Trash2, Filter } from 'lucide-react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
@@ -38,6 +38,7 @@ export function SessionDetail({ session, transactions, players, currentUserId }:
   const router = useRouter()
   const supabase = createClient()
   const [deleting, setDeleting] = useState<string | null>(null)
+  const [selectedPlayer, setSelectedPlayer] = useState<string>('all')
 
   const handleDeleteTransaction = async (transactionId: string) => {
     if (!confirm('Are you sure you want to delete this transaction?')) return
@@ -60,8 +61,24 @@ export function SessionDetail({ session, transactions, players, currentUserId }:
     }
   }
 
-  const totalAmount = transactions.reduce((sum, t) => sum + t.amount, 0)
-  const sortedPlayers = [...players].sort((a, b) => b.total - a.total)
+  // Filter transactions based on selected player
+  const filteredTransactions = useMemo(() => {
+    if (selectedPlayer === 'all') return transactions
+    return transactions.filter(t => t.user_id === selectedPlayer)
+  }, [transactions, selectedPlayer])
+
+  // Recalculate stats based on filtered transactions
+  const filteredStats = useMemo(() => {
+    const totalAmount = filteredTransactions.reduce((sum, t) => sum + t.amount, 0)
+    const filteredPlayers = selectedPlayer === 'all' 
+      ? players 
+      : players.filter(p => p.id === selectedPlayer)
+    const sortedPlayers = [...filteredPlayers].sort((a, b) => b.total - a.total)
+    
+    return { totalAmount, sortedPlayers }
+  }, [filteredTransactions, players, selectedPlayer])
+
+  const { totalAmount, sortedPlayers } = filteredStats
 
   return (
     <div className="max-w-md mx-auto px-4 py-6 space-y-6">
@@ -105,6 +122,25 @@ export function SessionDetail({ session, transactions, players, currentUserId }:
         <div className="mt-4 pt-4 border-t border-white/20">
           <p className="text-sm opacity-75">Total Pool</p>
           <p className="text-3xl font-bold">${Math.abs(totalAmount).toFixed(2)}</p>
+        </div>
+      </div>
+
+      {/* Player Filter */}
+      <div className="bg-white dark:bg-gray-800 halloween:bg-gray-900 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 halloween:border-orange-900 p-4">
+        <div className="flex items-center gap-3">
+          <Filter className="w-5 h-5 text-purple-500 halloween:text-orange-500 flex-shrink-0" />
+          <select
+            value={selectedPlayer}
+            onChange={(e) => setSelectedPlayer(e.target.value)}
+            className="flex-1 px-4 py-2 border-2 border-gray-200 dark:border-gray-600 halloween:border-orange-800 bg-white dark:bg-gray-700 halloween:bg-gray-800 text-gray-900 dark:text-white halloween:text-orange-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 halloween:focus:ring-orange-500 focus:border-transparent transition-all"
+          >
+            <option value="all">All Players ({players.length})</option>
+            {players.map((player) => (
+              <option key={player.id} value={player.id}>
+                {player.name} {player.id === currentUserId && '(You)'}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 
@@ -158,15 +194,22 @@ export function SessionDetail({ session, transactions, players, currentUserId }:
 
       {/* Transaction History */}
       <div className="bg-white dark:bg-gray-800 halloween:bg-gray-900 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 halloween:border-orange-900 p-6">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white halloween:text-orange-400 mb-4">Transaction History</h2>
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white halloween:text-orange-400 mb-4">
+          Transaction History
+          {selectedPlayer !== 'all' && (
+            <span className="text-sm font-normal text-gray-500 dark:text-gray-400 halloween:text-orange-400 ml-2">
+              ({filteredTransactions.length} of {transactions.length})
+            </span>
+          )}
+        </h2>
 
-        {transactions.length === 0 ? (
+        {filteredTransactions.length === 0 ? (
           <div className="text-center py-8 text-gray-400 dark:text-gray-500 halloween:text-orange-500">
-            <p>No transactions yet</p>
+            <p>No transactions {selectedPlayer !== 'all' && 'for this player'}</p>
           </div>
         ) : (
           <div className="space-y-3">
-            {transactions.map((transaction) => {
+            {filteredTransactions.map((transaction) => {
               const isWin = transaction.amount > 0
               const isOwnTransaction = transaction.user_id === currentUserId
               return (

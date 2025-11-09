@@ -29,6 +29,14 @@ After creating your Supabase project:
 3. Paste it into the SQL Editor
 4. Run the query to create all tables, views, and policies
 
+## Setting Up Storage for Profile Pictures
+
+To enable profile picture uploads:
+
+1. Follow the steps in `STORAGE_SETUP.md` to create the `avatars` storage bucket
+2. Set up the required storage policies for security
+3. This is required for the profile picture upload feature to work
+
 ## Enabling Google OAuth (Optional but Recommended)
 
 1. In your Supabase dashboard, go to Authentication > Providers
